@@ -9,7 +9,9 @@ from kivy.uix.label import Label
 from kivy.graphics import PushMatrix
 from kivy.graphics import PopMatrix
 from kivy.graphics import Rotate
+from kivy.graphics import Translate
 from kivy.graphics import Rectangle
+from kivy.graphics import Scale
 from kivy.graphics import Color
 from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
@@ -22,30 +24,35 @@ def getRandomPos(lessThanX, lessThanY):
         
 
 #the variables marked with underscores should not be touched except internally
-class FreeWidget(Widget):
+class SpriteWidget(Widget):
     freeAngle = None
     freePos = None
     _rotation_instruction = None
     _rectangle_instruction = None
+    _scale_instruction = None
+    _translate_instruction = None
     
     degreesPerSecond = None
     speedPixelsPerFrameXYPair = None
     
     def __init__(self, **kwargs):
-        super(FreeWidget, self).__init__(**kwargs)
+        super(SpriteWidget, self).__init__(**kwargs)
         self.freeAngle = 0.0
         self.degreesPerSecond = 0.0
         self.freePos = (10.0,100.0)
-        self._rotation_instruction = Rotate(angle=self.freeAngle, origin=self.freePos)
-        self._rectangle_instruction = Rectangle(source="bunny.png", pos=self.freePos, size=(41.0,41.0))
-#         with self.canvas.before:
-#             PushMatrix()
-#             Rotate(angle=self.freeAngle, origin = self.freePos)
+        self._rectangle_instruction = Rectangle(source="bunny.png", pos=(0,0), size=(41.0,41.0))
+        self._rotation_instruction = Rotate(angle=self.freeAngle, origin=(self._rectangle_instruction.size[0]/2.0,self._rectangle_instruction.size[1]/2.0))
+        self._scale_instruction = Scale(1.0,1.0,1.0)
+        self._translate_instruction = Translate(0,0)
+        
         self.canvas.add(PushMatrix())
-        self.canvas.add(self._rotation_instruction)  #self.canvas.add(Rotate(angle=self.freeAngle, origin = self.freePos))
+        self.canvas.add(self._translate_instruction)
+        self.canvas.add(self._rotation_instruction)
+        self.canvas.add(self._scale_instruction)
         self.canvas.add(Color(1.0,1.0,1.0,1.0))
-        self.canvas.add(self._rectangle_instruction)  #self.canvas.add(Rectangle(pos=self.freePos, size=(10.0,20.0)))
+        self.canvas.add(self._rectangle_instruction)
         self.canvas.add(PopMatrix())
+        
         self.refresh()
 #         with self.canvas.after:
 #             PopMatrix()
@@ -57,8 +64,10 @@ class FreeWidget(Widget):
         self._change_instructions()
     
     def _change_instructions(self):
-        self._rectangle_instruction.pos = self.freePos[0]-self._rectangle_instruction.size[0]/2.0, self.freePos[1]-self._rectangle_instruction.size[1]/2.0
-        self._rotation_instruction.origin = self.freePos
+        self._translate_instruction.x = self.freePos[0]-self._rectangle_instruction.size[0]*self._scale_instruction.x/2
+        self._translate_instruction.y = self.freePos[1]-self._rectangle_instruction.size[1]*self._scale_instruction.y/2
+        #self._rectangle_instruction.pos = self.freePos[0]-self._rectangle_instruction.size[0]*self._scale_instruction.x/2.0, self.freePos[1]-self._rectangle_instruction.size[1]*self._scale_instruction.y/2.0
+        self._rotation_instruction.origin = self._rectangle_instruction.size[0]*self._scale_instruction.x/2.0, self._rectangle_instruction.size[1]*self._scale_instruction.x/2.0 
         self._rotation_instruction.angle = self.freeAngle
         
         
@@ -87,6 +96,16 @@ class FreeWidget(Widget):
     def bounce_y(self):
         if self.speedPixelsPerFrameXYPair is not None:
             self.speedPixelsPerFrameXYPair = self.speedPixelsPerFrameXYPair[0], self.speedPixelsPerFrameXYPair[1]*-1.0
+            
+    def setScale(self, multiplier):
+        self._scale_instruction.x = float(multiplier)
+        self._scale_instruction.y = float(multiplier)
+        self._change_instructions()
+
+    def setScaleXY(self, xMultiplier, yMultiplier):
+        self._scale_instruction.x = float(xMultiplier)
+        self._scale_instruction.y = float(yMultiplier)
+        self._change_instructions()
 
 class MainForm(Widget):
     imperativeWidgets = None
@@ -104,11 +123,12 @@ class MainForm(Widget):
         return float(random.randrange(0,int(self.size[0]))), float(random.randrange(0,int(self.size[1])))
         
     def generateWidgetAt(self, x, y):
-        self.lastCreatedWidget = FreeWidget()
+        self.lastCreatedWidget = SpriteWidget()
         self.lastCreatedWidget.set_center_x(x)
         self.lastCreatedWidget.set_center_y(y)
         self.lastCreatedWidget.degreesPerSecond = float(random.randrange(0,3))
         self.lastCreatedWidget.speedPixelsPerFrameXYPair = getRandomPos(5,5)
+        self.lastCreatedWidget.setScale( float(random.randrange(5,20))/10.0 )
         self.add_widget(self.lastCreatedWidget)
         self.imperativeWidgets.append(self.lastCreatedWidget)
         self.imperativeLabel.text = "Tap if you like "+str(len(self.imperativeWidgets)+1)+" bunnies!"
@@ -140,18 +160,18 @@ class SpinningBunniesApp(App):
         self.mainForm = MainForm()
         Clock.schedule_interval(self.mainForm.update, 0)
         
-#         self.freeWidget1 = FreeWidget()
-#         self.lastCreatedWidget = self.freeWidget1
-#         self.freeWidget1.degreesPerSecond = (1.0)
-#         self.mainForm.add_widget(self.freeWidget1)
-#         self.imperativeWidgets.append(self.freeWidget1)
+#         self.spriteWidget1 = SpriteWidget()
+#         self.lastCreatedWidget = self.spriteWidget1
+#         self.spriteWidget1.degreesPerSecond = (1.0)
+#         self.mainForm.add_widget(self.spriteWidget1)
+#         self.imperativeWidgets.append(self.spriteWidget1)
         
-        self.freeWidget2 = FreeWidget()
-        self.lastCreatedWidget = self.freeWidget2
-        self.freeWidget2.degreesPerSecond = (3.0)
-        self.freeWidget2.speedPixelsPerFrameXYPair = 2.0,5.0
-        self.mainForm.add_widget(self.freeWidget2)
-        self.mainForm.imperativeWidgets.append(self.freeWidget2)
+        self.spriteWidget2 = SpriteWidget()
+        self.lastCreatedWidget = self.spriteWidget2
+        self.spriteWidget2.degreesPerSecond = (3.0)
+        self.spriteWidget2.speedPixelsPerFrameXYPair = 2.0,5.0
+        self.mainForm.add_widget(self.spriteWidget2)
+        self.mainForm.imperativeWidgets.append(self.spriteWidget2)
         
         self.mainForm.imperativeLabel = Label(text="Tap if you like bunnies!")
         
