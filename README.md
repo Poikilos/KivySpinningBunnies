@@ -6,6 +6,10 @@ The purpose of this program is to demonstrate PushMatrix, Rotate, then PopMatrix
 This code is a valuable start for making games.
 
 ##Usage:
+* Install Kivy http://www.expertmultimedia.com/usingpython/py3installingkivy.html
+* Download kivy_spinning_bunnies.py and bunny.png to the same folder on your computer
+* Right-click kivy_spinning_bunnies.py
+* Click SendTo, Kivy ...
 * Tap if you like bunnies
 
 ##Release Notes
