@@ -4,6 +4,9 @@ Kivy imperative rotation could only be better with bunnies--so I added them.
 The purpose of this program is to demonstrate PushMatrix, Rotate, then PopMatrix, which is how to rotate something in Kivy, using purely imperative (Python) code (no declarative [kv language] code).
 This code is a valuable start for making games.
 
+##Usage:
+* Tap if you like bunnies
+
 ##Release Notes
 * (2015-03-05) First working version
 
