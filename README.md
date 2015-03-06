@@ -7,7 +7,7 @@ This code is a valuable start for making games.
 
 ##Usage:
 * Install Kivy http://www.expertmultimedia.com/usingpython/py3installingkivy.html
-* Download kivy_spinning_bunnies.py and bunny.png to the same folder on your computer
+* Download kivy_spinning_bunnies.py, bunny.png, and LICENSE-GPL.txt to the same folder on your computer
 * Right-click kivy_spinning_bunnies.py
 * Click SendTo, Kivy ...
 * Tap if you like bunnies
