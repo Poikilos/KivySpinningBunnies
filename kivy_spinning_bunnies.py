@@ -22,31 +22,20 @@ def getRandomPos(lessThanX, lessThanY):
 class MainForm(Widget):
     imperativeWidgets = None
     lastCreatedWidget = None
+    
     imperativeLabel = None
     
     def __init__(self, **kwargs):
         super(MainForm, self).__init__(**kwargs)
         self.imperativeWidgets = list()
 
-    def on_touch_down(self, touch):
-        self.generateWidgetAt( touch.x, touch.y )
-        
-    def getRandomFormPos(self):
-        return float(random.randrange(0,int(self.size[0]))), float(random.randrange(0,int(self.size[1])))
-        
-    def generateWidgetAt(self, x, y):
-        self.lastCreatedWidget = SpriteWidget()
-        self.lastCreatedWidget.set_center_x(x)
-        self.lastCreatedWidget.set_center_y(y)
-        self.lastCreatedWidget.degreesPerSecond = float(random.randrange(0,3))
-        self.lastCreatedWidget.speedPixelsPerFrameXYPair = getRandomPos(5,5)
-        self.lastCreatedWidget.setScale( float(random.randrange(5,20))/10.0 )
-        self.add_widget(self.lastCreatedWidget)
-        self.imperativeWidgets.append(self.lastCreatedWidget)
-        self.imperativeLabel.text = "Tap if you like "+str(len(self.imperativeWidgets)+1)+" bunnies!"
-        
+        self.imperativeLabel = Label(text="Tap if you like bunnies!")
+        self.add_widget(self.imperativeLabel)
+        #self.imperativeLabel.size = self.imperativeLabel.texture_size
+
     def update(self, dt, *args):
-        self.imperativeLabel.set_center_y(self.height/3.0*2.0)
+        #self.generateWidgetAt(random.randrange(0,self.width),random.randrange(0,self.height))
+        self.imperativeLabel.set_center_y(self.height/2.0)
         self.imperativeLabel.set_center_x(self.width/2.0)
         for widgetIndex in range(0,len(self.imperativeWidgets)):
             thisWidget = self.imperativeWidgets[widgetIndex]
@@ -68,6 +57,25 @@ class MainForm(Widget):
                     thisWidget.bounce_y()
                     thisWidget.set_center_y(self.size[1]-1.0)
 
+
+    def getRandomFormPos(self):
+        return float(random.randrange(0,int(self.size[0]))), float(random.randrange(0,int(self.size[1])))
+
+    def on_touch_down(self, touch):
+        self.generateWidgetAt( touch.x, touch.y )
+        
+    def generateWidgetAt(self, x, y):
+        self.lastCreatedWidget = SpriteWidget()
+        self.lastCreatedWidget.set_center_x(x)
+        self.lastCreatedWidget.set_center_y(y)
+        self.lastCreatedWidget.degreesPerSecond = float(random.randrange(0,3))
+        self.lastCreatedWidget.speedPixelsPerFrameXYPair = getRandomPos(5,5)
+        self.lastCreatedWidget.setScale( float(random.randrange(5,20))/10.0 )
+        self.add_widget(self.lastCreatedWidget)
+        self.imperativeWidgets.append(self.lastCreatedWidget)
+        self.imperativeLabel.text = "Tap if you like "+str(len(self.imperativeWidgets)+1)+" bunnies!"
+        
+
 class SpinningBunniesApp(App):
     mainForm = None
     
@@ -88,11 +96,6 @@ class SpinningBunniesApp(App):
         self.spriteWidget2.speedPixelsPerFrameXYPair = 2.0,5.0
         self.mainForm.add_widget(self.spriteWidget2)
         self.mainForm.imperativeWidgets.append(self.spriteWidget2)
-        
-        self.mainForm.imperativeLabel = Label(text="Tap if you like bunnies!")
-        
-        self.mainForm.imperativeLabel.size = self.mainForm.imperativeLabel.texture_size
-        self.mainForm.add_widget(self.mainForm.imperativeLabel)
         
         return self.mainForm
     
